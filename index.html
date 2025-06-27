@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>DDR-opt</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/codemirror.min.js"></script>
+    <script src="js/clipboard.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/video_comparison.js"></script>
+
+
+    <script src="js/katex.min.js"></script>
+    <script src="js/katex-auto-render.min.js"></script>
+    <link rel="stylesheet" href="css/katex.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js" async></script>
+
+
+</head>
+
+
+<body>
+    <div class="container" id="main">
+        <div class="row">
+            <h2 class="col-md-12 text-center">
+                Seeing Before Flying: Active Perception Trajectory Planning in Unknown 3D Environments with Limited FOV
+            </h2>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <ul class="list-inline">
+                    <li>
+                        <a href="http://zju-fast.com/mengke-zhang/">
+                            Mengke Zhang
+                    </li>
+                    <br>
+                    <li>
+                        <a href="http://www.cse.zju.edu.cn/">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://hzi.zju.edu.cn/">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    &nbsp;&nbsp;无人机在仅依靠水平相机的FOV的情况下到达障碍物的上方，为了效率最高，无人机会选择往上飞尽可能的到达高处，但会发现上方是障碍物，在尽可能感知完自身上方的障碍物后会找到旁边的可行区域，并到达目标位置。 <br>
+                    &nbsp;&nbsp;图注：灰色方块表示障碍物; 紫色方块为观测到的障碍物; <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;绿色圆片为已知区域与未知区域的局部分界，红色箭头为指向已知空间的一侧; <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;紫色线为当前规划的轨迹，绿色段是主动感知段; 蓝色线为已执行的轨迹; <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;黑色线为FOV边界（一个四棱锥），红色数字是当前无人机的速度。
+                </p>
+            </div>
+        </div>
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="80%"  loop muted>
+                <source data-src="img/3box_1_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>提出的方法对比FASTER</h3>
+            </div>
+        </div>
+
+        <!-- 1. 对比FASTER; 2. 对比SUPER 3. 对比探索 -->
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    <a href="https://ieeexplore.ieee.org/document/9592663">FASTER</a>使用两条轨迹，即一条激进轨迹（认为未知空间都是安全的），一条备份轨迹（认为未知空间都是危险的），在激进轨迹末端还是没有观测到未知区域，则切换到备份轨迹，其在障碍物不密集且主要在水平方向运动时，可以满足需求： <br>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="80%"  loop muted>
+                <source data-src="img/FASTER_小障碍物_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    然而，其在障碍物密集且只能垂直方向运动时，则表现很差。这是因为其只考虑了安全，没有考虑主动观测。在水平方向上，由于机器人会朝前进方向观测，因此总有机会看到前方，而在竖直方向上，缺乏主动观测会导致无人机难以看到未知区域，导致其在障碍物前面一直停留（最后由于优化不出来直接轨迹规划失败穿墙而过了）： <br>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/FASTER_大障碍物_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    相较之下，<strong style="color: red;">所提出的方法可以对未知区域进行主动观测</strong>，因此可以在障碍物密集的情况下，在竖直方向上进行探索到达目标位置。注意，前述和后面的方法采用的是完全相同的前端，因此主动观测的行为都是后端优化的结果。 <br>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/Proposed_大障碍物_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>提出的方法对比SUPER</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    <a href="https://github.com/hku-mars/SUPER">SUPER</a>使用了类似FASTER的方法，即规划两条轨迹。其假设雷达作为传感器，在水平方向可以360度观测，因此大致在水平方向运动时，效果良好。 <br>
+                    下面是两种方法的对比，上面的是SUPER，下面的是所提出的方法，两者的规划结果差不多：
+                </p>
+            </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="100%"  loop muted>
+                <source data-src="img/SUPER.movie_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="100%"  loop muted>
+                <source data-src="img/my_1_batch.mp4" />
+            </video>
+        </div>
+
+    
+        <div class="col-md-16">
+            <p class="text-justify">
+                然而，SUPER做出了假设，即无人机周围点云是稠密的，这个假设包含机器人的上下方，然而，大部分雷达的FOV是有限的，在无人机的上下方并没有点云，这就使得该假设不成立。在目标位于无人机的上方时，SUPER会误认为上方也是安全的，因此发生碰撞（注意无人机直接穿越了上方的障碍物，因为是可视化仿真，没有碰撞检测）：
+            </p>
+        </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/FATSTER上下_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    相较之下，<strong style="color: red;">所提出的方法合理的限制了FOV的范围</strong>，因此可以避免与竖直方向上的不可见障碍物发生碰撞。 <br>
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/3box_1_1_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/Proposed乱走_batch.mp4" />
+            </video>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h3>提出的方法对比悲观的探索策略</h3>
+        </div>
+    </div>
+
+    <div class="col-md-16">
+        <p class="text-justify">
+            目前，主流的探索策略是悲观的，即认为未知区域都是危险的，因此会在未知区域的边界上进行探索。这一策略也被广泛的应用在轨迹优化中，即规划仅在已知区域上进行轨迹优化，终点设置在未知区域与已知区域的边界。这一方法可以有效地保证无人机的安全，但是会导致无人机在未知区域的边界上徘徊，且过多的刹停，严重影响运行效率。因此我们设计了一个管道环境用于测试，注意为了能看见无人机，管道壁被隐藏了，机器人被要求从底部到达管道顶部： <br>
+        </p>
+    </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/探索策略飞管道_batch.mp4" />
+            </video>
+        </div>
+
+        <div class="row">
+            <div class="col-md-16">
+                <p class="text-justify">
+                    相较之下，<strong style="color: red;">所提出的方法趋向于主动观测</strong>，因此可以更快的观测未知区域，比探索策略的速度快30%以上。 可以从视频中看出，无人机会主动后退以获得更大的观测范围，同时避免与未知区域内的障碍物发生碰撞。<br>
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-32">
+            <video controls class="lazy" id="video2" style="display: block; margin: 0 auto;" width="60%"  loop muted>
+                <source data-src="img/proposed飞管道_batch.mp4" />
+            </video>
+        </div>
+
+
+    <script>
+        renderMathInElement(
+            document.body,
+            {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "\\[", right: "\\]", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false }
+                ]
+            }
+        );
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"));
+
+            if ("IntersectionObserver" in window) {
+                var lazyVideoObserver = new IntersectionObserver(function (entries, observer) {
+                    entries.forEach(function (video) {
+                        if (video.isIntersecting) {
+                            for (var source in video.target.children) {
+                                var videoSource = video.target.children[source];
+                                if (typeof videoSource.tagName === "string" && videoSource.tagName === "SOURCE") {
+                                    videoSource.src = videoSource.dataset.src;
+                                }
+                            }
+
+                            video.target.load();
+                            video.target.classList.remove("lazy");
+                            lazyVideoObserver.unobserve(video.target);
+                        }
+                    });
+                });
+
+                lazyVideos.forEach(function (lazyVideo) {
+                    lazyVideoObserver.observe(lazyVideo);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
